@@ -1,0 +1,1 @@
+Copy variables.tf.template to variables.tf and set it.
