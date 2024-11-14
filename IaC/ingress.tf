@@ -40,37 +40,6 @@ resource "aws_security_group" "nlb_sg" {
   }
 }
 
-resource "aws_security_group" "nlb_to_ec2_sg" {
-  ingress = [{
-    cidr_blocks      = []
-    description      = "nlb only"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    ipv6_cidr_blocks = []
-    prefix_list_ids  = []
-    security_groups  = [aws_security_group.nlb_sg.id]
-    self             = false
-  }]
-
-  egress = [{
-    cidr_blocks      = ["0.0.0.0/0"]
-    description      = "alow all outbound"
-    from_port        = 0
-    to_port          = 0
-    protocol         = "-1"
-    ipv6_cidr_blocks = []
-    prefix_list_ids  = []
-    security_groups  = []
-    self             = false
-  }]
-  vpc_id = module.vpc.vpc_id
-
-  tags = {
-    "Name" = "${var.prefix}-nlb-to-ec2-sg"
-  }
-}
-
 module "aws-loadbalancer-controller-irsa-role" {
   source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
 
@@ -180,12 +149,7 @@ resource "helm_release" "nginx-ingress-controller" {
 
   set {
     name  = "controller.service.targetPorts.https"
-    value = "http"
-  }
-
-  set {
-    name  = "controller.service.port.http"
-    value = "0"
+    value = "https"
   }
 
   set {
