@@ -16,10 +16,11 @@ module "eks" {
 
   eks_managed_node_groups = {
     addon_nodes = {
-      ami_type     = "AL2023_x86_64_STANDARD"
-      desired_size = 2
-      min_size     = 1
-      max_size     = 4
+      vpc_security_group_ids = [module.eks.node_security_group_id, aws_security_group.nlb_to_ec2_sg.id]
+      ami_type               = "AL2023_x86_64_STANDARD"
+      desired_size           = 2
+      min_size               = 1
+      max_size               = 4
     }
   }
 
