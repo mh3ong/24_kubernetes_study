@@ -203,5 +203,5 @@ resource "helm_release" "nginx-ingress-controller" {
     value = module.ingress-controller-irsa-role.iam_role_arn
   }
 
-  depends_on = [module.eks, module.ingress-controller-irsa-role]
+  depends_on = [module.eks, module.ingress-controller-irsa-role, helm_release.aws-load-balancer-controller]
 }
