@@ -33,7 +33,7 @@ resource "aws_security_group" "nlb_sg" {
     security_groups  = []
     self             = false
   }]
-  vpc_id = module.vpc.vpc.id
+  vpc_id = module.vpc.vpc_id
 
   tags = {
     "Name" = "${var.prefix}-nlb-sg"
@@ -64,7 +64,7 @@ resource "aws_security_group" "nlb_to_ec2_sg" {
     security_groups  = []
     self             = false
   }]
-  vpc_id = module.vpc.vpc.id
+  vpc_id = module.vpc.vpc_id
 
   tags = {
     "Name" = "${var.prefix}-nlb-to-ec2-sg"
@@ -123,7 +123,7 @@ resource "helm_release" "aws-load-balancer-controller" {
 
   set {
     name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-    value = module.loadbalancer_controller_irsa_role.iam_role_arn
+    value = module.aws-loadbalancer-controller-irsa-role.iam_role_arn
   }
 
   set {
@@ -196,6 +196,11 @@ resource "helm_release" "nginx-ingress-controller" {
   set {
     name  = "serviceAccount.name"
     value = "ingress-nginx-controller-sa"
+  }
+
+  set {
+    name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
+    value = module.ingress-controller-irsa-role.iam_role_arn
   }
 
   depends_on = [module.eks, module.ingress-controller-irsa-role]
