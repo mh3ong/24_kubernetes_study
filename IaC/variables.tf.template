@@ -9,3 +9,7 @@ variable "awscli_profile" {
 variable "prefix" {
   default = "change me!"
 }
+
+variable "enable_ebs_csi_driver" {
+  default = false
+}
