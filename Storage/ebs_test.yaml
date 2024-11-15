@@ -1,0 +1,79 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ebs-test
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: ebs-test
+  name: pvc-ebs-test
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: ebs-sc
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: ebs-test
+  name: deployment-ebs
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: app-ebs
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: app-ebs
+    spec:
+      containers:
+      - image: nginx:latest
+        imagePullPolicy: Always
+        name: app-ebs
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: volume-ebs-test
+          mountPath: /usr/share/nginx/html
+      volumes:
+      - name: volume-ebs-test
+        persistentVolumeClaim:
+          claimName: pvc-ebs-test
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: ebs-test
+  name: service-ebs
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  type: NodePort
+  selector:
+    app.kubernetes.io/name: app-ebs
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: ebs-test
+  name: ingress-ebs
+spec:
+  ingressClassName: nginx
+  rules:
+    - http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: service-ebs
+              port:
+                number: 80
