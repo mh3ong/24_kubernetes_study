@@ -28,7 +28,7 @@ data:
         K8S-Logging.Exclude Off
 
     [OUTPUT]
-        Name          cloudwatch
+        Name          cloudwatch_logs
         Match         nginx.*
         region        ap-northeast-2
         log_group_name mhsong-eks-app-log
