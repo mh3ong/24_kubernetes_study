@@ -13,3 +13,7 @@ variable "prefix" {
 variable "enable_ebs_csi_driver" {
   default = false
 }
+
+variable "enable_efs_csi_driver" {
+  default = false
+}
