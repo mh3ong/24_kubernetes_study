@@ -4,43 +4,45 @@ metadata:
   name: fluent-bit-config
   namespace: kube-system
 data:
-# change log group name!!!
+  # change log group name!!!
   fluent-bit.conf: |
     [SERVICE]
         Flush         1
-        Log_Level     info
+        Log_Level     debug
         Parsers_File  parsers.conf
 
     [INPUT]
         Name          tail
         Path          /var/log/containers/deployment-nginx*.log
+        Parser        container
         Tag           nginx.*
-        DB            /var/log/flb_kube.db
-        Mem_Buf_Limit 5MB
-        Skip_Long_Lines On
-
+    
     [FILTER]
         Name          kubernetes
         Match         nginx.*
-        Kube_Tag_Prefix nginx
+        Kube_URL      https://kubernetes.default.svc.cluster.local:443
+        Kube_Token_File /var/run/secrets/kubernetes.io/serviceaccount/token
+        Kube_CA_File  /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
         Merge_Log     On
-        K8S-Logging.Parser On
-        K8S-Logging.Exclude Off
+        Keep_Log      Off
 
     [OUTPUT]
         Name          cloudwatch_logs
         Match         nginx.*
         region        ap-northeast-2
         log_group_name mhsong-eks-app-log
-        log_stream_prefix nginx
+        log_stream_name nginx
         auto_create_group true
+
   parsers.conf: |
     [PARSER]
-        Name        json
-        Format      json
-        Time_Key    time
-        Time_Format %Y-%m-%dT%H:%M:%S
-        Decode_Field_As escaped_utf8 log
+        Name         container
+        Format       json
+        Time_Key     time
+        Time_Format  %Y-%m-%dT%H:%M:%S.%L
+        Time_Keep    Off
+        Decode_Field_As json log
+
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -48,8 +50,37 @@ metadata:
   name: fluentbit-sa
   namespace: kube-system
   annotations:
-  # change me!
+    # change me!
     eks.amazonaws.com/role-arn: arn:aws:iam::694448341573:role/mhsong-fluentbit-sa-role
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fluent-bit-read
+  namespace: kube-system
+rules:
+  - apiGroups: [""]
+    resources:
+      - pods
+      - namespaces
+    verbs:
+      - get
+      - list
+      - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: fluent-bit-read
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: fluent-bit-read
+subjects:
+  - kind: ServiceAccount
+    name: fluentbit-sa
+    namespace: kube-system
 ---
 apiVersion: apps/v1
 kind: DaemonSet
@@ -69,24 +100,24 @@ spec:
     spec:
       serviceAccountName: fluentbit-sa
       containers:
-      - name: fluent-bit
-        image: fluent/fluent-bit:latest
-        resources:
-          limits:
-            memory: 200Mi
-          requests:
-            cpu: 100m
-            memory: 100Mi
-        volumeMounts:
-        - name: varlogcontainers
-          mountPath: /var/log/containers
-          readOnly: true
-        - name: config
-          mountPath: /fluent-bit/etc/
+        - name: fluent-bit
+          image: fluent/fluent-bit:latest
+          resources:
+            limits:
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 100Mi
+          volumeMounts:
+            - name: varlog
+              mountPath: /var/log
+              readOnly: true
+            - name: config
+              mountPath: /fluent-bit/etc/
       volumes:
-      - name: varlogcontainers
-        hostPath:
-          path: /var/log/containers
-      - name: config
-        configMap:
-          name: fluent-bit-config
+        - name: varlog
+          hostPath:
+            path: /var/log
+        - name: config
+          configMap:
+            name: fluent-bit-config
