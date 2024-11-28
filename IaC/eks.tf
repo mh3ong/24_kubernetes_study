@@ -33,5 +33,9 @@ module "eks" {
 
   enable_cluster_creator_admin_permissions = true
 
-  depends_on = [ module.vpc ]
+  tags = {
+    "karpenter.sh/discovery" = "${var.prefix}-k8s-cluster"
+  }
+
+  depends_on = [module.vpc]
 }

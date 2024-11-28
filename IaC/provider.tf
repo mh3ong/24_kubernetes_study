@@ -3,6 +3,12 @@ provider "aws" {
   profile = var.awscli_profile
 }
 
+provider "aws" {
+  region  = "us-east-1"
+  profile = var.awscli_profile
+  alias   = "virginia"
+}
+
 provider "helm" {
   kubernetes {
     host                   = module.eks.cluster_endpoint
