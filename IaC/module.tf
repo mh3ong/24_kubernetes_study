@@ -32,3 +32,10 @@ module "karpenter" {
   }
   depends_on = [module.eks]
 }
+
+module "prometheus" {
+  count             = var.enable_prometheus ? 1 : 0
+  source            = "./prometheus"
+
+  depends_on = [module.eks]
+}
