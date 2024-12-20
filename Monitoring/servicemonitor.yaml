@@ -4,14 +4,14 @@ metadata:
   namespace: kube-system
   name: fastapi-monitor
   labels:
-    release: prometheus
+    release: kube-prometheus-stack
 spec:
   selector:
     matchLabels:
       app.kubernetes.io/name: app-fastapi
   namespaceSelector:
     matchNames:
-      - kube-system
+      - monitoring-prom
   endpoints:
   - port: fastapi
     path: /metrics
