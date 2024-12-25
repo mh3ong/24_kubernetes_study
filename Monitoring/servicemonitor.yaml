@@ -1,7 +1,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  namespace: kube-system
+  namespace: monitoring-prom
   name: fastapi-monitor
   labels:
     release: kube-prometheus-stack
