@@ -1,0 +1,26 @@
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: deny-all-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: networking-app
+  policyTypes:
+  - Ingress
+---
+kind: NetworkPolicy
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: allow-approved-pods
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: networking-app
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              approved: "true"
+  policyTypes:
+    - Ingress

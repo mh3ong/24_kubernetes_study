@@ -28,7 +28,10 @@ module "eks" {
     coredns                = {}
     eks-pod-identity-agent = {}
     kube-proxy             = {}
-    vpc-cni                = {}
+    vpc-cni                = {
+      configuration_values = jsonencode({
+        enable-network-policy = true
+    }
   }
 
   enable_cluster_creator_admin_permissions = true
