@@ -33,9 +33,26 @@ module "karpenter" {
   depends_on = [module.eks]
 }
 
+module "nginx_ingress_controller" {
+  count             = var.enable_istio ? 0 : 1
+  source            = "./nginx_ingress_controller"
+  prefix            = var.prefix
+  oidc_provider_arn = module.eks.oidc_provider_arn
+  nlb_sg_id         = aws_security_group.nlb_sg.id
+  depends_on = [module.eks, helm_release.aws-load-balancer-controller]
+}
+
 module "prometheus" {
   count             = var.enable_prometheus ? 1 : 0
   source            = "./prometheus"
 
-  depends_on = [module.eks, helm_release.nginx-ingress-controller]
+  depends_on = [module.eks, module.nginx_ingress_controller]
+}
+
+module "istio" {
+  count             = var.enable_istio ? 1 : 0
+  source            = "./istio"
+  nlb_sg_id         = aws_security_group.nlb_sg.id
+  prefix            = var.prefix
+  depends_on = [module.eks, helm_release.aws-load-balancer-controller]
 }

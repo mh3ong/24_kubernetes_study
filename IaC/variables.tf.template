@@ -21,3 +21,7 @@ variable "enable_efs_csi_driver" {
 variable "enable_prometheus" {
   default = false
 }
+
+variable "enable_istio" {
+  default = false
+}
