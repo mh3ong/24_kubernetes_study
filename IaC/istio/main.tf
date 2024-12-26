@@ -42,14 +42,13 @@ resource "helm_release" "istio_ingress" {
 
   values = [
     <<EOT
-gateways:
-  istio-ingressgateway:
-    serviceAnnotations:
-      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
-      service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
-      service.beta.kubernetes.io/aws-load-balancer-security-groups: ${var.nlb_sg_id}
-      service.beta.kubernetes.io/aws-load-balancer-name: "${var.prefix}-istio-ingress-nlb"
-      service.beta.kubernetes.io/aws-load-balancer-manage-backend-security-group-rules: "true"
+service:
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    service.beta.kubernetes.io/aws-load-balancer-security-groups: ${var.nlb_sg_id}
+    service.beta.kubernetes.io/aws-load-balancer-name: "${var.prefix}-istio-ingress-nlb"
+    service.beta.kubernetes.io/aws-load-balancer-manage-backend-security-group-rules: "true"
 EOT
   ]
 }
