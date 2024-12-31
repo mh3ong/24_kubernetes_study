@@ -25,3 +25,7 @@ variable "enable_prometheus" {
 variable "enable_istio" {
   default = false
 }
+
+variable "enable_argocd" {
+  default = false
+}

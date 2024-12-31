@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: cicd
+  name: ingress-cicd
+spec:
+  ingressClassName: nginx
+  rules:
+      # Change this to the NLB domain
+    - host: "mhsong-ingress-nlb-88c15b0bdee7f68a.elb.ap-northeast-2.amazonaws.com"
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: service-cicd
+              port:
+                number: 8000
