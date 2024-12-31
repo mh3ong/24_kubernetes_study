@@ -10,7 +10,7 @@ async def home():
 
 @app.get("/call-service-b")
 async def call_service_b():
-    service_b_url = "http://service-b"
+    service_b_url = "http://service-b:8000"
     try:
         async with httpx.AsyncClient() as client:
             response = await client.get(service_b_url)

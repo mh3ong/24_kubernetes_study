@@ -14,7 +14,7 @@ metadata:
     app: service-a
 spec:
   ports:
-    - port: 80
+    - port: 8000
       name: http
   selector:
     app: service-a
@@ -50,7 +50,7 @@ metadata:
     app: service-b
 spec:
   ports:
-    - port: 80
+    - port: 8000
       name: http
   selector:
     app: service-b
@@ -84,7 +84,7 @@ metadata:
   namespace: microservices
 spec:
   selector:
-    istio: ingressgateway
+    istio: ingress
   servers:
     - port:
         number: 80
@@ -111,7 +111,7 @@ spec:
         - destination:
             host: service-a
             port:
-              number: 80
+              number: 8000
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
@@ -126,7 +126,7 @@ spec:
         - destination:
             host: service-b
             port:
-              number: 80
+              number: 8000
 
 ---
 apiVersion: networking.istio.io/v1beta1
