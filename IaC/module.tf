@@ -60,6 +60,5 @@ module "istio" {
 module "argocd" {
   count      = var.enable_argocd ? 1 : 0
   source     = "./argocd"
-  nlb_domain = module.nginx_ingress_controller[0].nlb_domain
   depends_on = [module.eks, module.nginx_ingress_controller]
 }
