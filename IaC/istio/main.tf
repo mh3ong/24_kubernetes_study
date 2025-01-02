@@ -50,7 +50,7 @@ service:
     service.beta.kubernetes.io/aws-load-balancer-name: "${var.prefix}-istio-ingress-nlb"
     service.beta.kubernetes.io/aws-load-balancer-manage-backend-security-group-rules: "true"
     service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: "ip"
-    service.beta.kubernetes.io/aws-load-balancer-healthcheck-port: 15021
+    service.beta.kubernetes.io/aws-load-balancer-healthcheck-port: "15021"
 EOT
   ]
 }
