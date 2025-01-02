@@ -8,7 +8,7 @@ resource "helm_release" "argocd" {
   values = [
     <<EOT
 global:
-  domain: ${var.nlb_domain}
+  domain: ${data.kubernetes_service.nginx_ingress_controller.status[0].load_balancer[0].ingress[0].hostname}
 configs:
   params:
     server.insecure: true
